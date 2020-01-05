@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   })
   
+  trading.associate = (models) => {
+    trading.belongsTo(models.user, { foreignKey: 'user_id', onDelete: 'CASCADE'})
+  }
 
   return trading
 }

@@ -22,5 +22,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM('Female', 'Male')
     }
   })
+
+  user.associate = (models) => {
+    user.hasMany(models.creditcard, { foreignKey: 'user_id', onDelete: 'CASCADE'})
+    user.hasMany(models.profitloss, { foreignKey: 'user_id', onDelete: 'CASCADE'})
+    user.hasMany(models.transaction, { foreignKey: 'user_id', onDelete: 'CASCADE'})
+    user.hasMany(models.trading, { foreignKey: 'user_id', onDelete: 'CASCADE'})
+  }
+
   return user
 }  

@@ -14,5 +14,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   })
 
+  profitloss.associate = (models) => {
+    profitloss.belongsTo(models.user, { foreignKey: 'user_id', onDelete: 'CASCADE'})
+  }
+
   return profitloss
 }
