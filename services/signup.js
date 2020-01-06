@@ -37,7 +37,7 @@ module.exports = (app, db) => {
           surname: req.body.surname,
           tel: req.body.tel,
           birth_date: req.body.birth_date,
-          gender: "Male",
+          gender: req.body.gender,
           user_id: Math.floor(10000000 + Math.random() * 90000000),
           role: "user"
         };

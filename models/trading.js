@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const trading = sequelize.defien('trading', {
+  const trading = sequelize.define('trading', {
     action : {
       type : DataTypes.ENUM('Buy', 'Sell')
     },

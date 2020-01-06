@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const creditcard = sequelize.defien('creditcard', {
+  const creditcard = sequelize.define('creditcard', {
     card_name: {
       type: DataTypes.STRING(100)
     },
