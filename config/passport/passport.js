@@ -16,29 +16,29 @@ jwtOption.secretOrKey = 'c0d3c4mp4'
 
 passport.use('register', new localStrategy(
   {
-    usernameField: 'email',
+    usernameField: 'username',
     passwordField: 'password',
     session: false,
   },
-  (email, password, done) => {
+  (username, password, done) => {
     db.user.findOne({
-      where:{email: email }
+      where: { username: username }
     }).then(user => {
-      if(user !== null){
-        console.log('E-mail already taken')
-        return done(null, false, { message: 'E-mail already taken'})
-      }else{
+      if (user !== null) {
+        console.log('Email already taken')
+        return done(null, false, { message: 'Email already taken' })
+      } else {
         let salt = bcrypt.genSaltSync(BCRYPT_SATL_ROUNDS);
         let hashedPassword = bcrypt.hashSync(password, salt)
-        db.user.create({email, password : hashedPassword})
-        .then(user => {
-          console.log('user create')
-          return done(null, user)
-        })
-        .catch(err => {
-          console.error(err)
-          done(err)
-        })
+        db.user.create({ username, password: hashedPassword })
+          .then(user => {
+            console.log('user create')
+            return done(null, user)
+          })
+          .catch(err => {
+            console.error(err)
+            done(err)
+          })
       }
     })
   }

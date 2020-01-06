@@ -9,14 +9,14 @@ module.exports = (sequelize, DataTypes) => {
     tel: {
       type: DataTypes.STRING(10)
     },
-    email: {
+    username: {
       type: DataTypes.STRING(100)
     },
     birth_date: {
-      type: DataTypes.DATE
+      type: DataTypes.DATE(6)
     },
     password: {
-      type: DataTypes.STRING(20)
+      type: DataTypes.STRING(500)
     },
     gender: {
       type: DataTypes.ENUM('Female', 'Male')

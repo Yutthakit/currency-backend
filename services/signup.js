@@ -25,14 +25,14 @@ module.exports = (app, db) => {
   app.post('/signup', (req, res, next) => {
     passport.authenticate('register', (err, user, info) => {
       if (err) {
-        console.error(err);
+        console.error(2);
       }
       if (info) {
         console.error(info.message)
         res.status(403).send({ message: err.message })
       } else {
         const data = {
-          email: user.email,
+          username: user.username,
           name: req.body.name,
           surname: req.body.surname,
           tel: req.body.tel,
@@ -42,7 +42,7 @@ module.exports = (app, db) => {
           role: "user"
         };
         db.user.findOne({
-          where: { email: email }
+          where: { username: username }
         })
           .then(user => {
             user.update({

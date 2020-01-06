@@ -12,5 +12,5 @@ module.exports = (sequelize, DataTypes) => {
     transaction.belongsTo(models.user, { foreignKey: 'user_id', onDelete: 'CASCADE' })
   }
 
-  return creditcard
+  return transaction
 }

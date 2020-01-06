@@ -7,12 +7,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(16)
     },
     valid_date: {
-      type: DataTypes.DATE
+      type: DataTypes.DATE()
     }
   })
 
   creditcard.associate = (models) => {
-    creditcard.belongsTo(models.user , { foreignKey: 'user_id', onDelete: 'CASCADE'})
+    creditcard.belongsTo(models.user, { foreignKey: 'user_id', onDelete: 'CASCADE' })
   }
   return creditcard
 }
