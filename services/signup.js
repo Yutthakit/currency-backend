@@ -1,24 +1,24 @@
 const passport = require('passport')
 
-module.exports = (app, db) => {
-  app.post('/signup', async (req, res) => {
-    try {
-      const result = await db.post.create({
-        name: req.body.name,
-        surname: req.body.surname,
-        email: req.body.email,
-        tel: req.body.tel,
-        birth_date: req.body.birth_date,
-        password: req.body.password,
-        gender: req.body.gender,
-        user_id: Math.floor(10000000 + Math.random() * 90000000) //ถ้า random มาซ้ำหละ
-      })
-      res.status(200).send(result)
-    } catch (error) {
-      res.status(400).send({ message: error.message })
-    }
-  })
-}
+// module.exports = (app, db) => {
+//   app.post('/signup', async (req, res) => {
+//     try {
+//       const result = await db.post.create({
+//         name: req.body.name,
+//         surname: req.body.surname,
+//         email: req.body.email,
+//         tel: req.body.tel,
+//         birth_date: req.body.birth_date,
+//         password: req.body.password,
+//         gender: req.body.gender,
+//         user_id: Math.floor(10000000 + Math.random() * 90000000) //ถ้า random มาซ้ำหละ
+//       })
+//       res.status(200).send(result)
+//     } catch (error) {
+//       res.status(400).send({ message: error.message })
+//     }
+//   })
+// }
 
 
 module.exports = (app, db) => {
