@@ -11,14 +11,15 @@ const jwtStrategy = require('passport-jwt').Strategy
 const extractjwt = require('passport-jwt').ExtractJwt
 const db = require('../../models')
 
-let jwtOption = {}
-jwtOption.secretOrKey = 'c0d3c4mp4'
+let jwtOptions = {}
+jwtOptions.secretOrKey = 'c0d3c4mp4'
 
 passport.use('register', new localStrategy(
   {
     usernameField: 'username',
     passwordField: 'password',
     session: false,
+
   },
   (username, password, done) => {
     db.user.findOne({
@@ -43,3 +44,53 @@ passport.use('register', new localStrategy(
     })
   }
 ))
+
+passport.use('login', new localStrategy(
+  {
+    usernameField: 'username',
+    passwordField: 'password',
+    session: false,
+  }, async (username, password, done) => {
+    let user = await db.user.findOne({
+      where: { username }
+    })
+    if (user === null) {
+      return done(null, false, { message: 'username or password is incorrect' })
+    }
+    bcrypt.compare(password, user.password, (err, response) => {
+      if (err) {
+        console.error(err)
+        done(err)
+      }
+      if (!response) {
+        return done(null, false, { message: 'username or password is incorrect' })
+      }
+      console.log(`user ${user.id} is found & authenticated`)
+      return done(null, user)
+    }
+    )
+  }
+
+))
+
+const opts = {
+  jwtFromRequest : extractjwt.fromAuthHeaderAsBearerToken(), secretOrKey : jwtOptions.secretOrKey
+}
+
+passport.use('jwt', new jwtStrategy(opts, (jwt_payload, done) => {
+  console.log({jwt_payload})
+  db.user.findOne({ where : {id: jwt_payload.id}})
+  .then(user => {
+    if(user) {
+      console.log("user found")
+      done(null, user)
+    } else {
+      console.log("user is not found")
+      done(null , false )
+    }
+  })
+}))
+
+
+
+module.exports =  jwtOptions
