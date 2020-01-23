@@ -29,8 +29,8 @@ passport.use('register', new localStrategy(
         console.log('Email already taken')
         return done(null, false, { message: 'Email already taken' })
       } else {
-        let salt = bcrypt.genSaltSync(BCRYPT_SATL_ROUNDS);
-        let hashedPassword = bcrypt.hashSync(password, salt)
+        var salt = bcrypt.genSaltSync(BCRYPT_SATL_ROUNDS);
+        var hashedPassword = bcrypt.hashSync(password, salt)
         db.user.create({ username, password: hashedPassword })
           .then(user => {
             console.log('user create')

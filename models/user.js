@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(100)
     },
     birth_date: {
-      type: DataTypes.DATE(6)
+      type: DataTypes.DATE
     },
     password: {
       type: DataTypes.STRING(500)
@@ -21,19 +21,17 @@ module.exports = (sequelize, DataTypes) => {
     gender: {
       type: DataTypes.ENUM('Female', 'Male')
     },
-    user_id: {
-      type: DataTypes.STRING(8)
-    },
     role: {
       type: DataTypes.ENUM("admin", "user")
     }
   })
 
   user.associate = (models) => {
-    user.hasMany(models.creditcard, { foreignKey: 'user_id', onDelete: 'CASCADE' })
+    user.hasMany(models.credit_card, { foreignKey: 'user_id', onDelete: 'CASCADE' })
     user.hasMany(models.profitloss, { foreignKey: 'user_id', onDelete: 'CASCADE' })
     user.hasMany(models.transaction, { foreignKey: 'user_id', onDelete: 'CASCADE' })
     user.hasMany(models.trading, { foreignKey: 'user_id', onDelete: 'CASCADE' })
+    user.hasMany(models.number_otp, { foreignKey: 'user_id' })
   }
 
   return user
