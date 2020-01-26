@@ -54,8 +54,9 @@ module.exports = (app, db) => {
         if ((moment(targetOtp.createdAt).diff(moment(), 'minutes')) > (-process.env.OTP_MINUTES_EXPIRSED)) {
           let addBalance = await db.user.findOne({ where: { id: req.user.id } })
           addBalance.update({
-            Balance: req.body.amount
+            Balance: parseInt(req.body.amount) + parseInt(addBalance.Balance)
           })
+          res.status(200).send({ message: `Deposit money ${req.body.amount} success` })
           targetOtp.destroy()
           res.status(200).send({ message: 'Verifly success' })
         } else {
