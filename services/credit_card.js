@@ -1,5 +1,5 @@
 const passport = require('passport')
-const moment = require('moment')
+
 const jwt = require('jsonwebtoken')
 const jwtOptions = require('../config/passport/passport')
 

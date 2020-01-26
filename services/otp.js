@@ -1,5 +1,6 @@
 const passport = require('passport')
 const nodemailer = require('nodemailer');
+const moment = require('moment')
 
 module.exports = (app, db) => {
 
@@ -42,13 +43,19 @@ module.exports = (app, db) => {
 
   app.get('/verify-otp', passport.authenticate('jwt', { session: false }),
     async (req, res) => {
-      const requestVerify = req.body.otp
+      const requestVerify = await req.body.otp
+      console.log(req.user.id)
       const targetOtp = await db.number_otp.findOne({ where: { user_id: req.user.id } })
-      if (requestVerify != targetOtp.number_otp) {
+      console.log(targetOtp)
+      if (!targetOtp && requestVerify != targetOtp.number_otp) {
         res.status(400).send({ message: " OTP is incorrect" })
       } else {
-        if ((moment(targetOtp.createdAt).diff(moment(), 'minutes')) > (-30)) {
-
+        console.log(process.env.OTP_MINUTES_EXPIRSED)
+        if ((moment(targetOtp.createdAt).diff(moment(), 'minutes')) > (-process.env.OTP_MINUTES_EXPIRSED)) {
+          let addBalance = await db.user.findOne({ where: { id: req.user.id } })
+          addBalance.update({
+            Balance: req.body.amount
+          })
           targetOtp.destroy()
           res.status(200).send({ message: 'Verifly success' })
         } else {

@@ -26,7 +26,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     email: {
       type : DataTypes.STRING(200) 
+    },
+    Balance : {
+      type : DataTypes.STRING(7)
     }
+
   })
 
   user.associate = (models) => {

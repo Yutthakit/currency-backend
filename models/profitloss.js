@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
   const profitloss = sequelize.define('profitloss', {
-    balance : {
+    balance_of_currency : {
       type : DataTypes.INTEGER
     },
     remain : {
