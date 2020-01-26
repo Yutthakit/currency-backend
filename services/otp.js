@@ -52,6 +52,11 @@ module.exports = (app, db) => {
       } else {
         console.log(process.env.OTP_MINUTES_EXPIRSED)
         if ((moment(targetOtp.createdAt).diff(moment(), 'minutes')) > (-process.env.OTP_MINUTES_EXPIRSED)) {
+          db.transaction.create({
+            user_id: req.user.id,
+            action : req.body.action,
+            value : req.body.amount
+          })
           let addBalance = await db.user.findOne({ where: { id: req.user.id } })
           addBalance.update({
             Balance: parseInt(req.body.amount) + parseInt(addBalance.Balance)
