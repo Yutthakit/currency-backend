@@ -4,57 +4,63 @@ const nodemailer = require('nodemailer');
 module.exports = (app, db) => {
 
   app.post('/send-otp', passport.authenticate('jwt', { session: false }),
-    (req, res) => {
+    async (req, res) => {
       db.number_otp.create({
         number_otp: Math.floor(1000 + Math.random() * 9000),
         user_id: req.user.id
       })
-        .then((result) => {
+        .then(async (result) => {
+          let tagetUser = await db.user.findOne({ where: { id: req.user.id } })
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: 'otpresponse@gmail.com',
+              pass: 'codecamp'
+            }
+          })
+          var mailOptions = {
+            from: 'otpresponse@gmail.com',
+            to: `${tagetUser.email}`,
+            subject: 'Verifly Credit Card',
+            text: ` OTP : ${result.number_otp}`
+          };
+          console.log(result.number_otp)
+          console.log(tagetUser.email)
+          transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          })
           res.status(200).send(result)
         }).catch((err) => {
           res.status(400).send({ message: err.message })
         });
     }
   )
+
+  app.get('/verify-otp', passport.authenticate('jwt', { session: false }),
+    async (req, res) => {
+      const requestVerify = req.body.otp
+      const targetOtp = await db.number_otp.findOne({ where: { user_id: req.user.id } })
+      if (requestVerify != targetOtp.number_otp) {
+        res.status(400).send({ message: " OTP is incorrect" })
+      } else {
+        if ((moment(targetOtp.createdAt).diff(moment(), 'minutes')) > (-30)) {
+
+          targetOtp.destroy()
+          res.status(200).send({ message: 'Verifly success' })
+        } else {
+          res.status(400).send({ message: 'OTP is exprise' })
+        }
+      }
+      const ms = moment(targetOtp.createdAt).diff(moment(), 'minutes')
+      console.log(requestVerify)
+      console.log(targetOtp.number_otp)
+      console.log(ms)
+    }
+  )
+
+
 }
-
-    // async (req, res) => {
-    //   // const sendOtp = await db.credit_card.findOne({
-    //   //   where: { user_id: req.user.id }
-    //   // })
-    //   // if (sendOtp !== null) {
-    //   //   db.otp.create({
-    //   //     number_otp: Math.floor(1000 + Math.random() * 9000),
-    //   //     user_id: req.user.id
-    //   //   })
-    //   // } else {
-    //   //   res.status(400).send({ message: "Error" })
-    //   // }
-    //   db.otp.create({
-    //     number_otp: Math.floor(1000 + Math.random() * 9000),
-    //     user_id: req.user.id
-    //   })
-    //   console.log(number_otp)
-    // }
-
-  // const transporter = nodemailer.createTransport({
-  //   service: 'gmail',
-  //   auth: {
-  //     user: 'otpresponse@gmail.com',
-  //     pass: 'codecamp'
-  //   }
-  // })
-  // var mailOptions = {
-  //   from: 'otpresponse@gmail.com',
-  //   to: 'yutakittha@gmail.com',
-  //   subject: 'Sending Email using Node.js',
-  //   text: 'That was easy!'
-  // };
-
-  // transporter.sendMail(mailOptions, function (error, info) {
-  //   if (error) {
-  //     console.log(error);
-  //   } else {
-  //     console.log('Email sent: ' + info.response);
-  //   }
-  // })

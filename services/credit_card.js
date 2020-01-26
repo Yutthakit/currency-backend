@@ -1,4 +1,5 @@
 const passport = require('passport')
+const moment = require('moment')
 const jwt = require('jsonwebtoken')
 const jwtOptions = require('../config/passport/passport')
 
@@ -24,6 +25,8 @@ module.exports = (app, db) => {
 
 
 
+
+
   // app.post('/add-credit-card', passport.authenticate('jwt', { session: false }),
   //   (req, res) => {
   //     db.creditcard.create({
@@ -32,17 +35,6 @@ module.exports = (app, db) => {
   //       card_no: req.body.card_no,
   //       valid_date: req.body.valid_date
   //     })
-  //   }
-  // )
-
-  // app.post('/send-otp', passport.authenticate('jwt', { session: false }),
-  //   (req, res) => {
-  //     db.otpTables.create({
-  //       user_id: req.user.id,
-  //       otp: Math.random(4)
-  //     })
-
-  //     const useremail = req.user.email
   //   }
   // )
 
