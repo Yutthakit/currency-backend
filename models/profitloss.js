@@ -1,10 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
   const profitloss = sequelize.define('profitloss', {
     currency_price_purchase : {
-      type : DataTypes.STRING(30)
+      type : DataTypes.FLOAT
     },
     value_invest : {
-      type: DataTypes.STRING(30)
+      type: DataTypes.FLOAT
     },
     currency_name : {
       type: DataTypes.ENUM('BTC', 'ETH', 'LTC', 'XRP', 'ZEC')

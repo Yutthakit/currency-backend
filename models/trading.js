@@ -3,13 +3,13 @@ module.exports = (sequelize, DataTypes) => {
     action : {
       type : DataTypes.ENUM('Buy', 'Sell')
     },
-    currency : {
+    currency_name : {
       type: DataTypes.ENUM('BTC', 'ETH', 'LTC', 'XRP', 'ZEC')
     },
-    currency_rate : {
+    currency_price : {
       type : DataTypes.STRING(10)
     },
-    invest : {
+    value : {
       type : DataTypes.STRING(10)
     }
   })
