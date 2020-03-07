@@ -44,10 +44,11 @@ module.exports = (app, db) => {
   app.get('/verify-otp', passport.authenticate('jwt', { session: false }),
     async (req, res) => {
       const requestVerify = await req.body.otp
+      console.log(requestVerify)
       console.log(req.user.id)
       const targetOtp = await db.number_otp.findOne({ where: { user_id: req.user.id } })
       console.log(targetOtp)
-      if (!targetOtp && requestVerify != targetOtp.number_otp) {
+      if ( requestVerify != targetOtp.number_otp ) {
         res.status(400).send({ message: " OTP is incorrect" })
       } else {
         console.log(process.env.OTP_MINUTES_EXPIRSED)
@@ -69,7 +70,6 @@ module.exports = (app, db) => {
         }
       }
       const ms = moment(targetOtp.createdAt).diff(moment(), 'minutes')
-      console.log(requestVerify)
       console.log(targetOtp.number_otp)
       console.log(ms)
     }

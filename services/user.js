@@ -41,6 +41,7 @@ module.exports = (app, db) => {
   })
 
   app.post('/login', (req, res, next) => {
+    console.log('reqBody', req.body)
     passport.authenticate('login', (err, user, info) => {
       if (err) {
         console.error(err)
@@ -64,4 +65,13 @@ module.exports = (app, db) => {
       res.status(200).send(req.user)
     }
   )
+
+  app.get('/users/:userId', async (req, res) => {
+    const result = await db.user.findAll({
+      where: {
+        id: req.params.userId
+      }
+    });
+    res.json(result);
+  })
 }
