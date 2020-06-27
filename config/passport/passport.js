@@ -78,7 +78,6 @@ const opts = {
 }
 
 passport.use('jwt', new jwtStrategy(opts, (jwt_payload, done) => {
-  console.log({jwt_payload})
   db.user.findOne({ where : {id: jwt_payload.id}})
   .then(user => {
     if(user) {

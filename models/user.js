@@ -25,10 +25,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM("admin", "user")
     },
     email: {
-      type : DataTypes.STRING(200) 
+      type: DataTypes.STRING(200)
     },
-    Balance : {
-      type : DataTypes.STRING(7)
+    Balance: {
+      type: DataTypes.STRING(7)
+    },
+    verify_account: {
+      type: DataTypes.INTEGER(1),
+      default: 0
     }
 
   })

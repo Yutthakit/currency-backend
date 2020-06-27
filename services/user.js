@@ -1,6 +1,7 @@
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const jwtOptions = require('../config/passport/passport')
+const bodyParser = require('body-parser')
 
 module.exports = (app, db) => {
   app.post('/register', (req, res, next) => {
@@ -41,7 +42,7 @@ module.exports = (app, db) => {
   })
 
   app.post('/login', (req, res, next) => {
-    console.log('reqBody', req.body)
+
     passport.authenticate('login', (err, user, info) => {
       if (err) {
         console.error(err)
@@ -66,12 +67,51 @@ module.exports = (app, db) => {
     }
   )
 
-  app.get('/users/:userId', async (req, res) => {
+  app.get('/user/:userId', async (req, res) => {
+
+    const { userId } = req.params
     const result = await db.user.findAll({
       where: {
-        id: req.params.userId
+        id: userId
       }
-    });
+    })
     res.json(result);
+  })
+
+  app.put('/user/:userId', async (req, res) => {
+    const { params, body } = req
+    const { userId } = params
+    const {
+      name,
+      surname,
+      tel,
+      birth_date,
+      gender,
+      email,
+    } = body
+
+    const dataUser = {
+      name,
+      surname,
+      tel,
+      birth_date,
+      gender,
+      email,
+    }
+
+    try {
+      const targetUser = await db.user.findOne({
+        where: {
+          id: userId
+        }
+      })
+      
+      await targetUser.update(dataUser)
+
+      console.log("111")
+      res.status(200).send({ message: 'Success' })
+    } catch (error) {
+      res.status(400).send({ message: error })
+    }
   })
 }
