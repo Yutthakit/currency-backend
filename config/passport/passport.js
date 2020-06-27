@@ -26,8 +26,8 @@ passport.use('register', new localStrategy(
       where: { username: username }
     }).then(user => {
       if (user !== null) {
-        console.log('Email already taken')
-        return done(null, false, { message: 'Email already taken' })
+        console.log('ID already taken')
+        return done(null, false, { message: 'ID already taken' })
       } else {
         var salt = bcrypt.genSaltSync(BCRYPT_SATL_ROUNDS);
         var hashedPassword = bcrypt.hashSync(password, salt)
@@ -74,22 +74,52 @@ passport.use('login', new localStrategy(
 ))
 
 const opts = {
-  jwtFromRequest : extractjwt.fromAuthHeaderAsBearerToken(), secretOrKey : jwtOptions.secretOrKey
+  jwtFromRequest: extractjwt.fromAuthHeaderAsBearerToken(), secretOrKey: jwtOptions.secretOrKey
 }
 
 passport.use('jwt', new jwtStrategy(opts, (jwt_payload, done) => {
-  db.user.findOne({ where : {id: jwt_payload.id}})
-  .then(user => {
-    if(user) {
-      console.log("user found")
-      done(null, user)
-    } else {
-      console.log("user is not found")
-      done(null , false )
-    }
-  })
+  db.user.findOne({ where: { id: jwt_payload.id } })
+    .then(user => {
+      if (user) {
+        console.log("user found")
+        done(null, user)
+      } else {
+        console.log("user is not found")
+        done(null, false)
+      }
+    })
 }))
 
 
+passport.use('repassword', new localStrategy(
+  {
+    usernameField: 'username',
+    passwordField: 'password',
+    session: false,
 
-module.exports =  jwtOptions
+  },
+  (username, password, done) => {
+    db.user.findOne({
+      where: { username: username }
+    }).then(user => {
+      if (user == null) {
+        console.log('ID dose not exist')
+        return done(null, false, { message: 'ID dose not exist' })
+      } else {
+        var salt = bcrypt.genSaltSync(BCRYPT_SATL_ROUNDS);
+        var hashedPassword = bcrypt.hashSync(password, salt)
+        db.user.update({ password: hashedPassword })
+          .then(user => {
+            console.log('password is update')
+            return done(null, user)
+          })
+          .catch(err => {
+            console.error(err)
+            done(err)
+          })
+      }
+    })
+  }
+))
+
+module.exports = jwtOptions

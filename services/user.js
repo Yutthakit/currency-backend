@@ -4,41 +4,45 @@ const jwtOptions = require('../config/passport/passport')
 const bodyParser = require('body-parser')
 
 module.exports = (app, db) => {
-  app.post('/register', (req, res, next) => {
-    console.log("user")
-    passport.authenticate('register', (err, user, info) => {
-      if (err) {
-        console.error(err.message);
-      }
-      if (info) {
-        console.error(info.message)
-        res.status(403).send({ message: err.message })
-      } else {
-        console.log(req.body.name)
-        db.user.findOne({
-          where: { username: req.body.username }
-        })
-          .then(user => {
-            user.update({
-              name: req.body.name,
-              surname: req.body.surname,
-              tel: req.body.tel,
-              // birth_date: req.body.birth_date,
-              gender: "male",
-              // user_id: Math.floor(10000000 + Math.random() * 90000000),
-              role: "user"
-            })
-              .then(() => {
-                console.log('user create in db')
-                res.status(200).send({ message: 'user create' })
-              })
+  app.post('/register', async (req, res, next) => {
+    try {
+      const { body } = req
+      const {
+        name,
+        surname,
+        email,
+        gender,
+        birth_date,
+        tel
+      } = body
+
+      await passport.authenticate('register', async (err, user, info) => {
+        if (err) {
+          console.error(err.message);
+        }
+        if (info) {
+          console.error(info.message)
+          res.status(403).send({ message: err.message })
+        }
+        else {
+          const userTarget = await db.user.findOne({
+            where: { username: req.body.username }
           })
-          .catch(err => {
-            console.error(err)
-            res.status(400).send({ message: err.message })
+          console.log(userTarget)
+          await userTarget.update({
+            name,
+            surname,
+            tel,
+            birth_date: Date(birth_date),
+            gender,
+            email
           })
-      }
-    })(req, res, next)
+        }
+      })(req, res, next)
+      res.status(200).send({ message: 'OK' })
+    } catch (error) {
+      res.status(400).send({ message: 'Error' })
+    }
   })
 
   app.post('/login', (req, res, next) => {
@@ -78,6 +82,10 @@ module.exports = (app, db) => {
     res.json(result);
   })
 
+  app.put('resetPassword', async (req, res) => {
+
+  })
+
   app.put('/user/:userId', async (req, res) => {
     const { params, body } = req
     const { userId } = params
@@ -105,7 +113,7 @@ module.exports = (app, db) => {
           id: userId
         }
       })
-      
+
       await targetUser.update(dataUser)
 
       console.log("111")
