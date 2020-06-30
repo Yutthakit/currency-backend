@@ -25,11 +25,10 @@ module.exports = (app, db) => {
           res.status(403).send({ message: err.message })
         }
         else {
-          const userTarget = await db.user.findOne({
+          const targetUser = await db.user.findOne({
             where: { username: req.body.username }
           })
-          console.log(userTarget)
-          await userTarget.update({
+          await targetUser.update({
             name,
             surname,
             tel,
@@ -71,43 +70,56 @@ module.exports = (app, db) => {
     }
   )
 
-  app.get('/user/:userId', async (req, res) => {
-
-    const { userId } = req.params
-    const result = await db.user.findAll({
-      where: {
-        id: userId
-      }
-    })
-    res.json(result);
+  app.get('/profile', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+      const { user } = req
+      const { id: userId } = user
+      console.log(userId)
+      const result = await db.user.findOne({
+        where: {
+          id: userId
+        }
+      })
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(401).send({
+        message: error
+      })
+    }
   })
 
-  app.put('resetPassword', async (req, res) => {
-
-  })
-
-  app.put('/user/:userId', async (req, res) => {
-    const { params, body } = req
-    const { userId } = params
-    const {
-      name,
-      surname,
-      tel,
-      birth_date,
-      gender,
-      email,
-    } = body
-
-    const dataUser = {
-      name,
-      surname,
-      tel,
-      birth_date,
-      gender,
-      email,
+  app.put('resetPassword', async (req, res, next) => {
+    try {
+      passport.authenticate('resetPassword', (err, user, info) => {
+        if (err) {
+          console.error(err)
+        }
+        if (info !== undefined) {
+          console.error(info.message)
+          res.status(400).send(info.message)
+        }
+      })(req, res, next)
+    } catch (error) {
+      res.status(400).send(error)
     }
 
+  })
+
+  app.put('/profile', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
+      const { user, body } = req
+      const { id: userId } = user
+      const {
+        name,
+        surname,
+        tel
+      } = body
+
+      const dataUser = {
+        name,
+        surname,
+        tel
+      }
       const targetUser = await db.user.findOne({
         where: {
           id: userId
@@ -115,10 +127,10 @@ module.exports = (app, db) => {
       })
 
       await targetUser.update(dataUser)
-
-      console.log("111")
       res.status(200).send({ message: 'Success' })
+
     } catch (error) {
+
       res.status(400).send({ message: error })
     }
   })

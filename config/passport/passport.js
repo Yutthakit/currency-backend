@@ -19,7 +19,6 @@ passport.use('register', new localStrategy(
     usernameField: 'username',
     passwordField: 'password',
     session: false,
-
   },
   (username, password, done) => {
     db.user.findOne({
@@ -91,7 +90,7 @@ passport.use('jwt', new jwtStrategy(opts, (jwt_payload, done) => {
 }))
 
 
-passport.use('repassword', new localStrategy(
+passport.use('reestPassword', new localStrategy(
   {
     usernameField: 'username',
     passwordField: 'password',
