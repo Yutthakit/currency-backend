@@ -9,6 +9,7 @@ const creditCardService = require('./services/credit_card')
 const transactionService = require('./services/transaction')
 const otpService = require('./services/otp')
 const profitlossService = require('./services/profitloss')
+const forgetPasswordService = require('./services/forgetPassword')
 const app = express()
 
 
@@ -24,7 +25,7 @@ db.sequelize.sync({ alter: true }).then(() => {
   otpService(app, db)
   transactionService(app, db)
   profitlossService(app, db)
-
+  forgetPasswordService(app, db)
   app.get('/protected', passport.authenticate('jwt', { session: false }),
 
     (req, res) => {

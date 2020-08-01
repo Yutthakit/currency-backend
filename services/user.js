@@ -1,7 +1,7 @@
+
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const jwtOptions = require('../config/passport/passport')
-const bodyParser = require('body-parser')
 
 module.exports = (app, db) => {
   app.post('/register', async (req, res, next) => {
@@ -45,7 +45,6 @@ module.exports = (app, db) => {
   })
 
   app.post('/login', (req, res, next) => {
-
     passport.authenticate('login', (err, user, info) => {
       if (err) {
         console.error(err)
@@ -86,23 +85,6 @@ module.exports = (app, db) => {
         message: error
       })
     }
-  })
-
-  app.put('resetPassword', async (req, res, next) => {
-    try {
-      passport.authenticate('resetPassword', (err, user, info) => {
-        if (err) {
-          console.error(err)
-        }
-        if (info !== undefined) {
-          console.error(info.message)
-          res.status(400).send(info.message)
-        }
-      })(req, res, next)
-    } catch (error) {
-      res.status(400).send(error)
-    }
-
   })
 
   app.put('/profile', passport.authenticate('jwt', { session: false }), async (req, res) => {

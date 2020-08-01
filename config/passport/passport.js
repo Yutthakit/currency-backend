@@ -72,6 +72,31 @@ passport.use('login', new localStrategy(
 
 ))
 
+passport.use('repass', new localStrategy(
+  {
+    usernameField: 'username',
+    passwordField: 'password',
+    session: false,
+  }, async (username, password, done) => {
+    let user = await db.user.findOne({
+      where: { username }
+    })
+    if (user === null) {
+      return done(null, false, { message: 'username dose not exist in db' })
+    }
+    var salt = bcrypt.genSaltSync(BCRYPT_SATL_ROUNDS);
+    var hashedPassword = bcrypt.hashSync(password, salt)
+    const dataUser = {
+      password: hashedPassword
+    }
+    const targetUser = await db.user.findOne({
+      where: { username }
+    })
+    await targetUser.update(dataUser)
+    return done(null, user)
+  }
+))
+
 const opts = {
   jwtFromRequest: extractjwt.fromAuthHeaderAsBearerToken(), secretOrKey: jwtOptions.secretOrKey
 }
@@ -90,35 +115,5 @@ passport.use('jwt', new jwtStrategy(opts, (jwt_payload, done) => {
 }))
 
 
-passport.use('reestPassword', new localStrategy(
-  {
-    usernameField: 'username',
-    passwordField: 'password',
-    session: false,
-
-  },
-  (username, password, done) => {
-    db.user.findOne({
-      where: { username: username }
-    }).then(user => {
-      if (user == null) {
-        console.log('ID dose not exist')
-        return done(null, false, { message: 'ID dose not exist' })
-      } else {
-        var salt = bcrypt.genSaltSync(BCRYPT_SATL_ROUNDS);
-        var hashedPassword = bcrypt.hashSync(password, salt)
-        db.user.update({ password: hashedPassword })
-          .then(user => {
-            console.log('password is update')
-            return done(null, user)
-          })
-          .catch(err => {
-            console.error(err)
-            done(err)
-          })
-      }
-    })
-  }
-))
 
 module.exports = jwtOptions
