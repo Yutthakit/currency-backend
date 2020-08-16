@@ -4,30 +4,7 @@ const nodemailer = require('nodemailer');
 module.exports = (app, db) => {
 
   app.put('/resetPassword/:userId', async (req, res, next) => {
-    // try {
-    //   console.log("111");
-    //   const { params, body } = req
-    //   const { userId } = params
-    //   const { username, password} = body
-    //   var salt = bcrypt.genSaltSync(BCRYPT_SATL_ROUNDS);
-    //   console.log(salt);
-    //   var hashedPassword = bcrypt.hashSync(password, salt)
-    //   console.log(hashedPassword);
-    //   const dataUser = {
-    //     password: hashedPassword
-    //   }
-    //   const targetUser = await db.user.findOne({
-    //     where: {
-    //       id: userId,
-    //       username
-    //     }
-    //   })
-    //   await targetUser.update(dataUser)
-    //   res.status(200).send({ message: 'OK' })
-    // } catch (error) {
-    //   res.status(400).send(error)
-    // }
-
+   
     passport.authenticate('repass', (err, user, info) => {
       if (err) {
         console.error(err)
