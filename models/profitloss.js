@@ -11,9 +11,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     currency_name : {
       type: DataTypes.ENUM('BTC', 'ETH', 'LTC', 'XRP')
-    },
-    user_id : {
-      type: DataTypes.INTEGER
     }
   })
 

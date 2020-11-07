@@ -1,12 +1,20 @@
-
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const jwtOptions = require('../config/passport/passport')
+const multer = require('multer');
+const upload = multer({
+  limits: {
+    fileSize: 4000000
+  }
+});
 
 module.exports = (app, db) => {
   app.post('/register', async (req, res, next) => {
     try {
-      const { body } = req
+      const {
+        body
+      } = req
+      console.log(body)
       const {
         name,
         surname,
@@ -22,11 +30,14 @@ module.exports = (app, db) => {
         }
         if (info) {
           console.error(info.message)
-          res.status(403).send({ message: err.message })
-        }
-        else {
+          res.status(403).send({
+            message: err.message
+          })
+        } else {
           const targetUser = await db.user.findOne({
-            where: { username: req.body.username }
+            where: {
+              username: req.body.username
+            }
           })
           await targetUser.update({
             name,
@@ -38,9 +49,13 @@ module.exports = (app, db) => {
           })
         }
       })(req, res, next)
-      res.status(200).send({ message: 'OK' })
+      res.status(200).send({
+        message: 'OK'
+      })
     } catch (error) {
-      res.status(400).send({ message: 'Error' })
+      res.status(400).send({
+        message: 'Error'
+      })
     }
   })
 
@@ -53,7 +68,13 @@ module.exports = (app, db) => {
         console.error(info.message)
         res.status(400).send(info.message)
       } else {
-        const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, jwtOptions.secretOrKey, { expiresIn: 3600 })
+        const token = jwt.sign({
+          id: user.id,
+          name: user.name,
+          role: user.role
+        }, jwtOptions.secretOrKey, {
+          expiresIn: 3600
+        })
         res.status(200).send({
           auth: true,
           token,
@@ -63,17 +84,24 @@ module.exports = (app, db) => {
     })(req, res, next)
   })
 
-  app.get('/protected-route', passport.authenticate('jwt', { session: false }),
+  app.get('/protected-route', passport.authenticate('jwt', {
+      session: false
+    }),
     function (req, res) {
       res.status(200).send(req.user)
     }
   )
 
-  app.get('/profile', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  app.get('/profile', passport.authenticate('jwt', {
+    session: false
+  }), async (req, res) => {
     try {
-      const { user } = req
-      const { id: userId } = user
-      console.log(userId)
+      const {
+        user
+      } = req
+      const {
+        id: userId
+      } = user
       const result = await db.user.findOne({
         where: {
           id: userId
@@ -87,16 +115,22 @@ module.exports = (app, db) => {
     }
   })
 
-  app.put('/profile', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  app.put('/profile', passport.authenticate('jwt', {
+    session: false
+  }), async (req, res) => {
     try {
-      const { user, body } = req
-      const { id: userId } = user
+      const {
+        user,
+        body
+      } = req
+      const {
+        id: userId
+      } = user
       const {
         name,
         surname,
         tel
       } = body
-
       const dataUser = {
         name,
         surname,
@@ -109,11 +143,36 @@ module.exports = (app, db) => {
       })
 
       await targetUser.update(dataUser)
-      res.status(200).send({ message: 'Success' })
+      res.status(200).send({
+        message: 'Success'
+      })
 
     } catch (error) {
 
-      res.status(400).send({ message: error })
+      res.status(400).send({
+        message: error
+      })
     }
   })
+
+  app.post('/upload-image', upload.single('avatar'), passport.authenticate('jwt', {
+      session: false
+    }),
+    async (req, res) => {
+      const {
+        file
+      } = req
+      const {
+        fieldname,
+        originalname,
+        encoding,
+        mimetype,
+        size,
+      } = file
+      console.log(        fieldname,
+        originalname,
+        encoding,
+        mimetype,
+        size)
+    })
 }

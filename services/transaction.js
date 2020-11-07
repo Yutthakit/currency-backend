@@ -1,5 +1,5 @@
 const passport = require('passport')
-const bodyParser = require('body-parser')
+const moment = require('moment')
 
 
 module.exports = (app, db) => {
@@ -38,7 +38,7 @@ module.exports = (app, db) => {
     try {
       const { body, user } = req
       const { id: userId } = user
-      const { amount, action } = body
+      const { amount } = body
 
       const targetUser = await db.user.findOne({
         where: { id: userId }
@@ -75,5 +75,38 @@ module.exports = (app, db) => {
     else
       throw Error('Balance is not enough')
   }
+
+  app.get('/history-transaction',passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+      const {
+        user
+      } = req
+      const {
+        id: userId
+      } = user
+      const data = await  db.transaction.findAll({
+        where: {
+          user_id: userId
+        }
+      })
+
+      const result = []
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].value !== '0') {
+          result.push({
+            key: i+1,
+            action: [data[i].action],
+            value: data[i].value,
+            createdAt: moment(data[i].createdAt).format('LLLL'),
+          })
+        }
+      }
+      res.status(200).send(result)
+    } catch (error) {
+      
+    }
+  })
+
+
 
 }

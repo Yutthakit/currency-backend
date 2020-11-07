@@ -12,9 +12,11 @@ const profitlossService = require('./services/profitloss')
 const forgetPasswordService = require('./services/forgetPassword')
 const staticService = require('./services/static')
 const app = express()
-
+const multer = require('multer');
+const upload = multer({ limits: { fileSize: 4000000 } });
 
 app.use(passport.initialize())
+app.use(upload.single('avatar'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
