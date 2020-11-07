@@ -105,17 +105,4 @@ module.exports = (app, db) => {
       res.status(200).send({ message: 'Balance is update' })
     }
   )
-
-  // app.post('/add-balance', passport.authenticate('jwt', { session: false }),
-  //   async (req, res) => {
-  //     const targetUser = await db.profitloss.findOne({ where: { user_id: req.user.id } })
-  //     if(targetUser){
-  //       targetUser.update({
-  //         balance: targetUser.balance + req.body.balance
-  //       })
-  //     }else {
-  //       res.status(404).send({})
-  //     }
-  //   }
-  // )
 }
