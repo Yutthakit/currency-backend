@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     value: {
       type: DataTypes.STRING(16)
+    },
+    status: {
+      type: DataTypes.INTEGER(1)
     }
   })
 

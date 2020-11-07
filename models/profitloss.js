@@ -6,14 +6,14 @@ module.exports = (sequelize, DataTypes) => {
     value_invest : {
       type: DataTypes.FLOAT
     },
+    value_per_unit: {
+      type: DataTypes.FLOAT
+    },
     currency_name : {
-      type: DataTypes.ENUM('BTC', 'ETH', 'LTC', 'XRP', 'ZEC')
+      type: DataTypes.ENUM('BTC', 'ETH', 'LTC', 'XRP')
     },
-    profit_loss : {
-      type : DataTypes.STRING(30)
-    },
-    balance_in_currency: {
-      type: DataTypes.STRING(30)
+    user_id : {
+      type: DataTypes.INTEGER
     }
   })
 

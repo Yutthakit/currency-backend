@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(200)
     },
     Balance: {
-      type: DataTypes.STRING(7)
+      type: DataTypes.INTEGER()
     },
     verify_account: {
       type: DataTypes.INTEGER(1),
