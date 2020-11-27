@@ -14,6 +14,7 @@ const staticService = require('./services/static')
 const app = express()
 const multer = require('multer');
 const upload = multer({ limits: { fileSize: 4000000 } });
+const cron = require('node-cron')
 
 app.use(passport.initialize())
 app.use(upload.single('avatar'))
@@ -37,6 +38,10 @@ db.sequelize.sync({ alter: true }).then(() => {
     }
 
   )
+
+  cron.schedule('* * * * * *', () => {
+    console.log('test ');
+  })
 
   app.listen(8080, () => {
     console.log("Server is running port 8080")

@@ -125,4 +125,50 @@ module.exports = (app, db) => {
       throw new Error("Value Per Unit not enough");
     }
   };
+
+  app.get(
+    "/profitloss/profile",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+      try {
+        const { id: user_id } = req.user;
+        const targetProfit = await db.profitloss.findAll({
+          where: { user_id },
+        });
+
+        const result = [];
+        if (targetProfit) {
+          for (let i = 0; i < targetProfit.length; i++) {
+            const {
+              currency_name,
+              value_per_unit,
+              value_invest,
+            } = targetProfit[i];
+
+            const { value } = await db.price_store.findOne({
+              where: {
+                currency_name,
+              },
+              order: [["createdAt", "DESC"]],
+            });
+            console.log(value);
+            const amount = parseFloat(value_invest) * parseFloat(value_per_unit)
+            const marketVal = parseFloat(value_per_unit) * parseFloat(value)
+            const diffPrice = marketVal - amount
+            const calPercent = (diffPrice / amount) * 100
+            result.push({
+              name: currency_name,
+              value_per_unit,
+              value_invest,
+              actual_value: amount,
+              market_value: marketVal,
+              percent: calPercent.toFixed(2)
+            })
+          }
+        }
+
+        res.status(200).send(result);
+      } catch (error) {}
+    }
+  );
 };
