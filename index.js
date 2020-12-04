@@ -7,6 +7,7 @@ const cors = require('cors')
 const userService = require('./services/user')
 const creditCardService = require('./services/credit_card')
 const transactionService = require('./services/transaction')
+const batchCurrency = require('./services/batch/genCurrencyPrice')
 const otpService = require('./services/otp')
 const profitlossService = require('./services/profitloss')
 const forgetPasswordService = require('./services/forgetPassword')
@@ -40,7 +41,7 @@ db.sequelize.sync({ alter: true }).then(() => {
   )
 
   cron.schedule('* * * * * *', () => {
-    console.log('test ');
+    // batchCurrency(db)
   })
 
   app.listen(8080, () => {

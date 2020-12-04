@@ -21,6 +21,7 @@ module.exports = (app, db) => {
         const targetProfit = await db.profitloss.findOne({
           where: { user_id, currency_name },
         });
+        console.log(targetProfit)
 
         if (targetProfit) {
           const {
@@ -34,10 +35,14 @@ module.exports = (app, db) => {
             parseFloat(valueOfCurrencyPerUnit) + parseFloat(OldValuePerUnit);
           const newCurrencyPrice =
             parseFloat(newValueInvest) / parseFloat(newValuePerUnit);
-
+          console.log(
+             newValueInvest,
+             newCurrencyPrice,
+             newValuePerUnit,
+          )
           await targetProfit.update({
-            currency_price_purchase: newValueInvest,
-            value_invest: newCurrencyPrice,
+            currency_price_purchase: newCurrencyPrice,
+            value_invest: newValueInvest,
             value_per_unit: newValuePerUnit,
           });
         } else {
@@ -104,7 +109,9 @@ module.exports = (app, db) => {
 
           const targetUser = await db.user.findOne({ where: { id: user_id } });
           const { Balance } = targetUser;
+          console.log(Balance)
           const newBalance = parseFloat(Balance) + parseFloat(valueSell);
+          console.log(newBalance)
           await targetUser.update({
             Balance: newBalance,
           });
