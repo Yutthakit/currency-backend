@@ -120,6 +120,10 @@ module.exports = (app, db) => {
         }
         res.status(200).send({ message: "Balance is update" });
       } catch (error) {
+        console.log(error)
+        if (error == 'Error: Value Per Unit not enough') {
+          res.status(308).send(error.message);
+        }
         res.status(400).send({ message: error });
       }
     }
@@ -138,14 +142,17 @@ module.exports = (app, db) => {
     passport.authenticate("jwt", { session: false }),
     async (req, res) => {
       try {
+        console.log('1')
         const { id: user_id } = req.user;
         const targetProfit = await db.profitloss.findAll({
           where: { user_id },
         });
-
+        
         const result = [];
         if (targetProfit) {
+          console.log('1.1')
           for (let i = 0; i < targetProfit.length; i++) {
+            console.log('1.2')
             const {
               currency_name,
               value_per_unit,
@@ -156,7 +163,7 @@ module.exports = (app, db) => {
               where: {
                 currency_name,
               },
-              order: [["createdAt", "DESC"]],
+              // order: [["createdAt", "DESC"]],
             });
             console.log(value);
             const amount = parseFloat(value_invest) * parseFloat(value_per_unit)
@@ -175,7 +182,9 @@ module.exports = (app, db) => {
         }
 
         res.status(200).send(result);
-      } catch (error) {}
+      } catch (error) {
+        console.log(error)
+      }
     }
   );
 };

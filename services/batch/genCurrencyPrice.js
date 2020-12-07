@@ -11,13 +11,19 @@ module.exports = (db) => {
         where: {
           currency_name: DICT[i],
         },
-        order: [["createdAt", "DESC"]],
+        order: [
+          ["createdAt", "DESC"]
+        ],
       });
-      const { value, currency_name } = targetPrice;
+      const {
+        value,
+        currency_name
+      } = targetPrice;
 
       const digit = Math.floor(Math.random() * 10 + 1);
       const dot = Math.floor(Math.random() * 100 + 1);
       const randomPosition = randomNumber(0, 2);
+
       function randomNumber(min, max) {
         return Math.random() * (max - min) + min;
       }
@@ -32,23 +38,23 @@ module.exports = (db) => {
             .catch((err) => console.log(err));
           break;
         case 1:
-          const percent = 1 + Number(`${digit}.${dot}`) / 100;
-          const newVal = Number(value) * Number(percent);
+          const percentPlus = 1 + Number(`${digit}.${dot}`) / 100;
+          const newValPlus = Number(value) * Number(percentPlus);
           await db.price_store
             .create({
               currency_name,
-              value: newVal,
+              value: transfromData(currency_name, newValPlus),
             })
             .then(() => console.log("Created Done"))
             .catch((err) => console.log(err));
           break;
         case 2:
-          const percent = 1 - Number(`${digit}.${dot}`) / 100;
-          const newVal = Number(value) * Number(percent);
+          const percentDown = 1 - Number(`${digit}.${dot}`) / 100;
+          const newValDown = Number(value) * Number(percentDown);
           await db.price_store
             .create({
               currency_name,
-              value: newVal,
+              value: transfromData(currency_name, newValDown),
             })
             .then(() => console.log("Created Done"))
             .catch((err) => console.log(err));
@@ -56,6 +62,29 @@ module.exports = (db) => {
       }
     }
   };
+
+  const transfromData = (type, num) => {
+    let result
+    switch (type) {
+      case 'BTC':
+        result = parseInt(num)
+        break;
+
+      case 'ETH':
+        result = parseInt(num)
+        break;
+
+      case 'LTC':
+        result = parseInt(num)
+        break;
+
+      case 'XRP':
+        result = parseFloat(num).toFixed(2)
+        break;
+
+    }
+    return result
+  }
 
   createPrice();
 };
