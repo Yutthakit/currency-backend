@@ -35,11 +35,7 @@ module.exports = (app, db) => {
             parseFloat(valueOfCurrencyPerUnit) + parseFloat(OldValuePerUnit);
           const newCurrencyPrice =
             parseFloat(newValueInvest) / parseFloat(newValuePerUnit);
-          console.log(
-             newValueInvest,
-             newCurrencyPrice,
-             newValuePerUnit,
-          )
+
           await targetProfit.update({
             currency_price_purchase: newCurrencyPrice,
             value_invest: newValueInvest,
