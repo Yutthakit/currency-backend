@@ -159,7 +159,7 @@ module.exports = (app, db) => {
               where: {
                 currency_name,
               },
-              // order: [["createdAt", "DESC"]],
+              order: [["createdAt", "DESC"]],
             });
             console.log(value);
             const amount = parseFloat(value_invest) * parseFloat(value_per_unit)

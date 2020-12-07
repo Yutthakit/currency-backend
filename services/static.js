@@ -1,15 +1,21 @@
 // const HISTORY = require('../static');
 const moment = require("moment");
+const passport = require("passport");
 
-module.exports = (app) => {
+module.exports = (app, db) => {
   app.get(
     "/static/history/:symbol",
-    passport.authenticate("jwt", { session: false }),
+    passport.authenticate("jwt", {
+      session: false
+    }),
     async (req, res) => {
       try {
-        const { symbol } = req.params;
-        const { id: user_id } = req.user;
-
+        const {
+          symbol
+        } = req.params;
+        const {
+          id: user_id
+        } = req.user;
         const BTC = [
           11482,
           11487,
@@ -47,23 +53,23 @@ module.exports = (app) => {
           xrp: XRP,
         };
         const getDate = [];
-
+        console.log('2')
         for (let i = 0; i < 10; i++) {
           const date = moment().subtract(i, "days").format("L");
           getDate.push(`${date}`);
         }
 
-        const { value_invest } = await db.profitloss.findOne({
+        const test = await db.profitloss.findOne({
           where: {
             currency_name: `${symbol}`,
-            where: { user_id },
-          },
+            user_id
+          }
         });
-
+        
         const data = {
-          price: DICT[`${symbol}`],
+          price: DICT[`${symbol.toLowerCase()}`],
           date: getDate,
-          has_invest: value_invest !== 0,
+          has_invest: test ? test.value_invest !== 0 : false,
         };
         res.send(data);
       } catch (error) {

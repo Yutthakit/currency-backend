@@ -14,16 +14,24 @@ const forgetPasswordService = require('./services/forgetPassword')
 const staticService = require('./services/static')
 const app = express()
 const multer = require('multer');
-const upload = multer({ limits: { fileSize: 4000000 } });
+const upload = multer({
+  limits: {
+    fileSize: 4000000
+  }
+});
 const cron = require('node-cron')
 
 app.use(passport.initialize())
 app.use(upload.single('avatar'))
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({
+  extended: true
+}))
 app.use(cors())
 require('./config/passport/passport')
-db.sequelize.sync({ alter: true }).then(() => {
+db.sequelize.sync({
+  alter: true
+}).then(() => {
 
   creditCardService(app, db)
   userService(app, db)
@@ -31,8 +39,10 @@ db.sequelize.sync({ alter: true }).then(() => {
   transactionService(app, db)
   profitlossService(app, db)
   forgetPasswordService(app, db)
-  staticService(app)
-  app.get('/protected', passport.authenticate('jwt', { session: false }),
+  staticService(app, db)
+  app.get('/protected', passport.authenticate('jwt', {
+      session: false
+    }),
 
     (req, res) => {
       res.send(req.users)
