@@ -50,8 +50,8 @@ db.sequelize.sync({
 
   )
 
-  cron.schedule('* * * * * *', () => {
-    // batchCurrency(db)
+  cron.schedule('*/10 * * * * *', () => {
+    batchCurrency(db)
   })
 
   app.listen(8080, () => {
