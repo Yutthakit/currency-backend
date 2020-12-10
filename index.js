@@ -50,7 +50,7 @@ db.sequelize.sync({
 
   )
 
-  cron.schedule('*/10 * * * * *', () => {
+  cron.schedule('0 0 * * * *', () => {
     batchCurrency(db)
   })
 

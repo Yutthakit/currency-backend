@@ -16,44 +16,25 @@ module.exports = (app, db) => {
         const {
           id: user_id
         } = req.user;
-        const BTC = [
-          11482,
-          11487,
-          11487,
-          11482,
-          11481,
-          11481,
-          11480,
-          11477,
-          11481,
-          11483,
-        ];
 
-        const ETH = [384, 383, 383, 382, 386, 386, 387, 392, 366, 370];
+        const price = [];
 
-        const LTC = [19, 11, 12, 13, 26, 28, 26, 23, 30, 34];
+        const targetPrice = await db.price_store.findAll({
+          where: {
+            currency_name: symbol,
+          },
+          limit: 10,
+          order: [
+            ["createdAt", "DESC"]
+          ],
+        });
 
-        const XRP = [
-          0.25,
-          0.41,
-          0.29,
-          0.37,
-          0.16,
-          0.19,
-          0.23,
-          0.66,
-          0.69,
-          0.44,
-        ];
+        for (let i = 0; i < targetPrice.length; i++) {
+          const v = targetPrice[i]
+          price.push(v.value)
+        }
 
-        const DICT = {
-          btc: BTC,
-          eth: ETH,
-          ltc: LTC,
-          xrp: XRP,
-        };
         const getDate = [];
-        console.log('2')
         for (let i = 0; i < 10; i++) {
           const date = moment().subtract(i, "days").format("L");
           getDate.push(`${date}`);
@@ -65,13 +46,14 @@ module.exports = (app, db) => {
             user_id
           }
         });
-        
+
         const data = {
-          price: DICT[`${symbol.toLowerCase()}`],
+          price ,
           date: getDate,
           has_invest: test ? test.value_invest !== 0 : false,
         };
-        res.send(data);
+
+        res.status(200).send(data);
       } catch (error) {
         res.status(400).send(error);
       }

@@ -136,6 +136,8 @@ module.exports = (app, db) => {
         surname,
         tel
       }
+
+      console.log(dataUser)
       const targetUser = await db.user.findOne({
         where: {
           id: userId

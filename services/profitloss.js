@@ -3,11 +3,18 @@ const passport = require("passport");
 module.exports = (app, db) => {
   app.post(
     "/buy-currency",
-    passport.authenticate("jwt", { session: false }),
+    passport.authenticate("jwt", {
+      session: false
+    }),
     async (req, res) => {
       try {
-        const { user, body } = req;
-        const { id: user_id } = user;
+        const {
+          user,
+          body
+        } = req;
+        const {
+          id: user_id
+        } = user;
         const {
           value_invest, // buy 600 thb
           currency_name,
@@ -15,13 +22,14 @@ module.exports = (app, db) => {
           value_per_unit: valueOfCurrencyPerUnit,
         } = body;
 
-        // const valueOfCurrencyPerUnit = Number(value_invest)/ Number(currency_price_purchase) // จำนวนหุ้น 2 ตัว
 
         // check history
         const targetProfit = await db.profitloss.findOne({
-          where: { user_id, currency_name },
+          where: {
+            user_id,
+            currency_name
+          },
         });
-        console.log(targetProfit)
 
         if (targetProfit) {
           const {
@@ -52,75 +60,113 @@ module.exports = (app, db) => {
           await db.profitloss.create(dataProfitloss);
         }
 
-        const targetUser = await db.user.findOne({ where: { id: user_id } });
-        const { Balance } = targetUser;
+        const targetUser = await db.user.findOne({
+          where: {
+            id: user_id
+          }
+        });
+        const {
+          Balance
+        } = targetUser;
         const newBalance = parseFloat(Balance) - parseFloat(value_invest);
         await targetUser.update({
           Balance: newBalance,
         });
 
-        res.status(200).send({ message: "Success" });
+        res.status(200).send({
+          message: "Success"
+        });
       } catch (error) {
-        res.status(400).send({ message: error });
+        res.status(400).send({
+          message: error
+        });
       }
     }
   );
 
   app.post(
     "/sell-currency",
-    passport.authenticate("jwt", { session: false }),
+    passport.authenticate("jwt", {
+      session: false
+    }),
     async (req, res) => {
       try {
-        const { body, user } = req;
-        const { id: user_id } = user;
-        const { value_per_unit, currency_name, currency_price_sell } = body;
+        const {
+          body,
+          user
+        } = req;
+        const {
+          id: user_id
+        } = user;
+        const {
+          value_invest,
+          value_per_unit,
+          currency_name,
+        } = body;
+
 
         const targetProfit = await db.profitloss.findOne({
-          where: { user_id, currency_name },
+          where: {
+            user_id,
+            currency_name
+          },
         });
         if (targetProfit) {
-          const {
-            value_per_unit: OldValuePerUnit,
-            value_invest: OldValueInvest,
-            currency_price_purchase: OldCurrencyPrice,
-          } = targetProfit;
-          checkValue(OldValuePerUnit, value_per_unit);
+          if (targetProfit.value_per_unit > value_per_unit) {
+            const {
+              value_per_unit: OldValuePerUnit,
+              currency_price_purchase: OldCurrency
+            } = targetProfit;
+            checkValue(OldValuePerUnit, value_per_unit);
 
-          const percenWeight =
-            1 - parseFloat(value_per_unit) / parseFloat(OldValuePerUnit);
-          const newValuePerUnit =
-            parseFloat(OldValuePerUnit) * parseFloat(percenWeight);
-          const newValueInvest =
-            parseFloat(OldValueInvest) * parseFloat(percenWeight);
-          const newCurrencyPrice =
-            parseFloat(OldCurrencyPrice) * parseFloat(percenWeight);
-          await targetProfit.update({
-            currency_price_purchase: newValueInvest,
-            value_invest: newCurrencyPrice,
-            value_per_unit: newValuePerUnit,
+            const newValuePerUnit = parseFloat(OldValuePerUnit) - parseFloat(value_per_unit);
+            const newValueInvest = parseFloat(OldCurrency) * parseFloat(newValuePerUnit);
+            console.log({
+              currency_price_purchase: OldCurrency,
+              value_invest: newValueInvest,
+              value_per_unit: newValuePerUnit,
+            });
+            await targetProfit.update({
+              currency_price_purchase: OldCurrency,
+              value_invest: newValueInvest,
+              value_per_unit: newValuePerUnit,
+            });
+          } else if (targetProfit.value_per_unit == value_per_unit) {
+            console.log(targetProfit.id);
+            await targetProfit.destroy({
+              where: {
+                id: targetProfit.id
+              }
+            })
+          } else {
+            throw new Error(`Can't sell currency`);
+          }
+
+          const targetUser = await db.user.findOne({
+            where: {
+              id: user_id
+            }
           });
-
-          const valueSell =
-            parseFloat(currency_price_sell) * parseFloat(value_per_unit);
-
-          const targetUser = await db.user.findOne({ where: { id: user_id } });
-          const { Balance } = targetUser;
-          console.log(Balance)
-          const newBalance = parseFloat(Balance) + parseFloat(valueSell);
-          console.log(newBalance)
+          const {
+            Balance
+          } = targetUser;
+          const newBalance = parseFloat(Balance) + parseFloat(value_invest);
           await targetUser.update({
             Balance: newBalance,
           });
         } else {
           throw Error(`Can't sell currency`);
         }
-        res.status(200).send({ message: "Balance is update" });
+        res.status(200).send({
+          message: "Balance is update"
+        });
       } catch (error) {
-        console.log(error)
         if (error == 'Error: Value Per Unit not enough') {
           res.status(308).send(error.message);
         }
-        res.status(400).send({ message: error });
+        res.status(400).send({
+          message: error
+        });
       }
     }
   );
@@ -135,41 +181,50 @@ module.exports = (app, db) => {
 
   app.get(
     "/profitloss/profile",
-    passport.authenticate("jwt", { session: false }),
+    passport.authenticate("jwt", {
+      session: false
+    }),
     async (req, res) => {
       try {
         console.log('1')
-        const { id: user_id } = req.user;
+        const {
+          id: user_id
+        } = req.user;
         const targetProfit = await db.profitloss.findAll({
-          where: { user_id },
+          where: {
+            user_id
+          },
         });
-        
+
         const result = [];
         if (targetProfit) {
-          console.log('1.1')
           for (let i = 0; i < targetProfit.length; i++) {
-            console.log('1.2')
             const {
               currency_name,
               value_per_unit,
               value_invest,
+              currency_price_purchase
             } = targetProfit[i];
 
-            const { value } = await db.price_store.findOne({
+            const {
+              value
+            } = await db.price_store.findOne({
               where: {
                 currency_name,
               },
-              order: [["createdAt", "DESC"]],
+              order: [
+                ["createdAt", "DESC"]
+              ],
             });
             console.log(value);
-            const amount = parseFloat(value_invest) * parseFloat(value_per_unit)
+            const amount = parseFloat(value_invest)
             const marketVal = parseFloat(value_per_unit) * parseFloat(value)
             const diffPrice = marketVal - amount
             const calPercent = (diffPrice / amount) * 100
             result.push({
               name: currency_name,
               value_per_unit,
-              value_invest,
+              value_invest: currency_price_purchase,
               actual_value: amount,
               market_value: marketVal,
               percent: calPercent.toFixed(2)

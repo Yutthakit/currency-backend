@@ -15,19 +15,21 @@ module.exports = (db) => {
           ["createdAt", "DESC"]
         ],
       });
+
       const {
         value,
         currency_name
       } = targetPrice;
 
-      const digit = Math.floor(Math.random() * 10 + 1);
+      const digit = Math.floor(Math.random() * 4 + 1);
       const dot = Math.floor(Math.random() * 100 + 1);
-      const randomPosition = randomNumber(0, 2);
+      const randomPosition = randomNumber(0, 3);
 
       function randomNumber(min, max) {
         return Math.random() * (max - min) + min;
       }
-      switch (randomPosition) {
+      console.log(parseInt(randomPosition))
+      switch (parseInt(randomPosition)) {
         case 0:
           await db.price_store
             .create({

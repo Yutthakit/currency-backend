@@ -33,7 +33,7 @@ module.exports = (app, db) => {
       const { id: userId, email } = result
       console.log(userId)
       console.log(email)
-      const linkResetPassword = `http://localhost:8080/resetPassword/${userId}`
+      const linkResetPassword = `http://localhost:3000/resetPassword/${userId}`
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
